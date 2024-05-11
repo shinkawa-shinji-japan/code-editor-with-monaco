@@ -1,0 +1,16 @@
+# *
+# !code-editor-with-monaco/*
+
+# Ignore everything
+/*
+
+# But not this folder
+!/code-editor-with-monaco
+
+# However, ignore everything inside this folder
+/code-editor-with-monaco/*
+
+# Except the contents
+!/code-editor-with-monaco/**/*
+!.gitignore
+!README.md
