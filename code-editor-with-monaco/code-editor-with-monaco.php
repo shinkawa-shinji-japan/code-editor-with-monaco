@@ -46,30 +46,11 @@ function replace_textarea_with_monaco()
     <div class="pTab">
         <div class="pTab__toggleFieldsSelector">
             <div class="pTab__toggleFieldsTitle">Show Fields: </div>
-            <div class="pTab__toggleFieldsButton active" data-toggle-fields="content">Content</div>
-            <div class="pTab__toggleFieldsButton" data-toggle-fields="css">Page CSS</div>
-            <div class="pTab__toggleFieldsButton" data-toggle-fields="footer">Page Footer</div>
+            <div class="pTab__toggleFieldsButton active js-toggleButton" data-toggle-fields="content" data-target-editor-id="editor-content" data-target-textarea-id="content" data-target-editor-id="editor-content" data-editor-language="html">Content</div>
         </div>
-        <div class="pTab__columnsSelector">
-            <div class="pTab__columnsSelectorTitle">Columns: </div>
-            <div class="pTab__columnChangeButton active" data-columns="1">1</div>
-            <div class="pTab__columnChangeButton" data-columns="2">2</div>
-            <div class="pTab__columnChangeButton" data-columns="3">3</div>
-        </div>
-        <div class="pTab__tabNamesContainer">
-            <div class="pTab__tabName active" data-tab-name="content">content</div>
-            <div class="pTab__tabName" data-tab-name="css">css</div>
-            <div class="pTab__tabName" data-tab-name="footer">footer</div>
-        </div>
-        <div class="pTab__tabItemsContainer">
-            <div class="pTab__tabItem active" data-tab-item="content">
-                <div id="editor-container" class="editor-container mb100"></div>
-            </div>
-            <div class="pTab__tabItem" data-tab-item="css">
-                    <div id="editor-container-css" class="editor-container mb100"></div>
-            </div>
-            <div class="pTab__tabItem" data-tab-item="footer">
-                    <div id="editor-container-footer" class="editor-container"></div>
+        <div class="pTab__tabItemsContainer pTab__tabItemsContainer--col3">
+            <div class="pTab__tabItem active" data-tab-item="content" id="editor-content">
+                <!-- <div id="editor-container" class="editor-container mb100"></div> -->
             </div>
         </div>
     </div>

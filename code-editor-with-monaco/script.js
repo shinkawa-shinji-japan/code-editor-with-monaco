@@ -1,223 +1,167 @@
+const appendItemDivToItemsContainer = (id) => {
+    const newDiv = document.createElement("div");
+    newDiv.classList.add("pTab__tabItem");
+    newDiv.classList.add("active");
+    newDiv.id = id;
+    const container = document.querySelector(".pTab__tabItemsContainer");
+    container.appendChild(newDiv);
 
-const initContentEditor = () => {
-    require.config({ paths: { "vs": "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.21.2/min/vs" } });
-    require(["vs/editor/editor.main"], function() {
-        var editor = monaco.editor.create(document.getElementById("editor-container"), {
-            value: document.getElementById("content").value,
-            language: "html",
-            theme: "vs-dark",
-        });
-        editor.getModel().updateOptions({
-            tabSize: 2,
-            insertSpaces: true,
-            autoClosingBrackets: "always",
-            autoClosingQuotes: "always",
-            autoClosingTags: true // 効いてないぽい
-        });
-        
-        editor.onDidChangeModelContent(function() {
-            document.getElementById("content").value = editor.getValue();
-        });
+    return newDiv;
+};
 
-        monaco.languages.registerCompletionItemProvider("html", {
-            provideCompletionItems: () => {
-                var suggestions = [{
-                    label: "div",
-                    kind: monaco.languages.CompletionItemKind.Snippet,
-                    insertText: "<div>\${1}</div>",
-                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    documentation: "Inserts a div tag"
-                }];
-                return { suggestions: suggestions };
-            }
-        });
+const createFieldButtons = (
+    {
+        text,
+        editorId,
+        initEditor,
+        textareaId,
+        language
+    }
+) => {
+    const newDiv = document.createElement("div");
+    newDiv.classList.add("pTab__toggleFieldsButton");
+    newDiv.classList.add("js-toggleButton");
+    newDiv.classList.add("active");
+    newDiv.innerText = text;
+    // newDiv.setAttribute("data-text", text);
+    newDiv.setAttribute("data-target-editor-id", editorId);
+    newDiv.setAttribute("data-target-textarea-id", textareaId);
+    newDiv.setAttribute("data-editor-language", language);
 
-        
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function() {
-            document.querySelector("#publish, #save-post").click(); // 保存ボタンを押す
-        });
+    const container = document.querySelector(".pTab__toggleFieldsSelector");
+    container.appendChild(newDiv);
+    // divにクリックイベントリスナーを追加
+    newDiv.addEventListener("click", () => {
+        const tabItem = document.getElementById(editorId);
 
+        if (tabItem.classList.contains("active")) {
+            newDiv.classList.remove("active");
+            tabItem.classList.remove("active");
+            // tabItem.innerHTML = '<div class="editor-container"></div>';
+            tabItem.innerHTML = null;
+            return;
+        }
+
+        tabItem.classList.add("active");
+        newDiv.classList.add("active");
+        // tabItem.innerHTML = '<div class="editor-container"></div>';
+        // initEditor();
+        initMonacoEditor({ targetId: editorId, textareaId, language })
     });
-}
-initContentEditor();
 
 
-const initCssEditor = () => {
-    require.config({ paths: { "vs": "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.21.2/min/vs" } });
-    require(["vs/editor/editor.main"], function() {
-        var cssEditor = document.getElementById("acf-field_66379ff1bb2ed");
-        if (!cssEditor) return; 
-        console.log(cssEditor);
-        
-        var editor = monaco.editor.create(document.getElementById("editor-container-css"), {
-            value: cssEditor.value,
-            language: "css",
-            theme: "vs-dark",
-        });
-        editor.getModel().updateOptions({
-            tabSize: 2,
-            insertSpaces: true,
-            autoClosingBrackets: "always",
-            autoClosingQuotes: "always",
-            autoClosingTags: true // 効いてないぽい
-        });
-        // var editor = monaco.editor.create(container, {
-        //     value: cssEditor.value,
-        //     language: "css",
-        //     theme: "vs-dark"
-        // });
-        editor.onDidChangeModelContent(function() {
-            cssEditor.value = editor.getValue();
-        });
-        
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function() {
+    return newDiv;
+};
+
+const initMonacoEditor = ({ targetId, textareaId, language }) => {
+    const editor = monaco.editor.create(document.getElementById(targetId), {
+        value: document.getElementById(textareaId).value,
+        language: language,
+        theme: "vs-dark",
+    });
+
+    editor.getModel().updateOptions({
+        tabSize: 2,
+        insertSpaces: true,
+        autoClosingBrackets: "always",
+        autoClosingQuotes: "always",
+        autoClosingTags: true, // 効いてないぽい
+    });
+    editor.onDidChangeModelContent(function () {
+        editor.value = editor.getValue();
+    });
+
+    editor.addCommand(
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S,
+        function () {
             document.querySelector("#publish, #save-post").click(); // 保存ボタンを押す
-        });
+        }
+    );
 
-        
-        // Alt + Shift + F にフォーマット機能を紐付け
-        editor.addCommand(monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KEY_F, function() {
+    // Alt + Shift + F にフォーマット機能を紐付け
+    editor.addCommand(
+        monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KEY_F,
+        function () {
             const formatted = prettier.format(editor.getValue(), {
-                parser: "css",
+                parser: language,
                 plugins: prettierPlugins,
                 tabWidth: 2,
-                useTabs: false
+                useTabs: false,
             });
-    
+
             editor.setValue(formatted);
-        });
-    
+        }
+    );
+}
+
+const initMonacoEditors = () => {
+    require.config({
+        paths: {
+            vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.21.2/min/vs",
+        },
     });
-}
-initCssEditor();
+    require(["vs/editor/editor.main"], function () {
+        // WordPress content Editor
+        {
+            const editorId = "editor-content";
+            initMonacoEditor({ targetId: editorId, textareaId: "content", language: "html" })
+            document.querySelector(".js-toggleButton[data-toggle-fields=\"content\"]").addEventListener("click", function () {
+                const newDiv = this;
 
+                const tabItem = document.getElementById(editorId);
 
-const initFooterEditor = () => {
-    require.config({ paths: { "vs": "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.21.2/min/vs" } });
-    require(["vs/editor/editor.main"], function() {
-        var footerCodeEditor = document.getElementById("acf-field_663f571173e99");
-        if (!footerCodeEditor) return; 
-        
-        var editor = monaco.editor.create(document.getElementById("editor-container-footer"), {
-            value: footerCodeEditor.value,
-            language: "html",
-            theme: "vs-dark",
-        });
-        editor.getModel().updateOptions({
-            tabSize: 2,
-            insertSpaces: true,
-            autoClosingBrackets: "always",
-            autoClosingQuotes: "always",
-            autoClosingTags: true
-        });
+                if (tabItem.classList.contains("active")) {
+                    newDiv.classList.remove("active");
+                    tabItem.classList.remove("active");
+                    // tabItem.innerHTML = '<div class="editor-container"></div>';
+                    tabItem.innerHTML = null;
+                    return;
+                }
 
-        editor.onDidChangeModelContent(function() {
-            footerCodeEditor.value = editor.getValue();
-        });
-        
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function() {
-            document.querySelector("#publish, #save-post").click(); // 保存ボタンを押す
-        });
-    });
-}
-// initFooterEditor();
+                tabItem.classList.add("active");
+                newDiv.classList.add("active");
+                // tabItem.innerHTML = '<div class="editor-container"></div>';
+                initMonacoEditor({ targetId: editorId, textareaId: "content", language: "html" })
+            });
+        }
 
-
-document.querySelectorAll(".pTab__tabName").forEach(element => {
-    element.addEventListener("click", function() {
-        showTab(this.getAttribute("data-tab-name"), this);
-    });
-});
-
-
-const resetContentEditor = () => {
-    const tabItem = document.querySelector('[data-tab-item="content"]');
-
-    if (tabItem) {
-        tabItem.innerHTML = '<div id="editor-container" class="editor-container"></div>'; 
-    }
-
-    initContentEditor();
-}
-const resetCssEditor = () => {
-    const tabItem = document.querySelector('[data-tab-item="css"]');
-
-    if (tabItem) {
-        tabItem.innerHTML = '<div id="editor-container-css" class="editor-container"></div>'; 
-    }
-
-    initCssEditor();
-}
-const resetFooterEditor = () => {
-    const tabItem = document.querySelector('[data-tab-item="footer"]');
-
-    if (tabItem) {
-        tabItem.innerHTML = '<div id="editor-container-footer" class="editor-container"></div>'; 
-    }
-
-    initFooterEditor();
-}
-
-const showTab = (name, clickedElment) => {
-    
-    const isAllActive = () => {
-        const all = document.querySelectorAll(".pTab__tabItem");
-        const len = all.length;
-        let i = 0;
-        all.forEach(item => {
-            if (item.classList.contains("active")) {
-                i += 1;
+        let idNumber = 1;
+        document.querySelectorAll(".with-monaco").forEach((withMonacoElement) => {
+            let language = "html",
+                target = null;
+            if (withMonacoElement.classList.contains("with-monaco-html")) {
+                language = "html";
+                target = document.getElementById("editor-container-footer");
             }
-        });
-        console.log(i);
-        if (i === len) return true;
-        return false;
-    }
-    if (isAllActive()) return;
-    
-    document.querySelectorAll(".pTab__tabName").forEach(element => {
-        element.classList.remove("active");
-    });
-
-    document.querySelectorAll(".pTab__tabItem").forEach(element => {
-        element.classList.remove("active");
-    });
-
-    clickedElment.classList.add("active");
-    document.querySelector('[data-tab-item="' + name + '"]').classList.add("active");
-
-    if (name === "content") {
-        resetContentEditor()
-        return
-    }
-
-    if (name === "css") {
-        resetCssEditor();
-        return
-    }
-
-    if (name === "footer") {
-        resetFooterEditor();
-        return
-    }
-}
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    // すべてのトグルフィールドボタンにイベントリスナーを設定
-    document.querySelectorAll('.pTab__toggleFieldsButton').forEach(button => {
-        button.addEventListener('click', function() {
-            // ボタンのdata-toggle-fields属性から対象のフィールド名を取得
-            const targetField = this.getAttribute('data-toggle-fields');
-            this.classList.toggle("active");
-
-            // 対応するタブアイテムを選択
-            const targetTabItem = document.querySelector(`.pTab__tabItem[data-tab-item="${targetField}"]`);
-
-            // 対象のタブアイテムのactiveクラスをトグル
-            if (targetTabItem) {
-                targetTabItem.classList.toggle('active');
+            if (withMonacoElement.classList.contains("with-monaco-css")) {
+                language = "css";
+                target = document.getElementById("editor-container-css");
             }
+
+            const editorId = `editor-${idNumber}`;
+            appendItemDivToItemsContainer(editorId);
+            idNumber++;
+
+            const textarea = withMonacoElement.querySelector("textarea");
+
+            initMonacoEditor({ targetId: editorId, textareaId: textarea.id, language })
+
+            const label =
+                withMonacoElement.querySelector(".acf-label label").innerText;
+
+            createFieldButtons({
+                text: label,
+                editorId,
+                initEditor: () => initMonacoEditor({
+                    targetId: editorId,
+                    textareaId: textarea.id,
+                    language
+                }),
+                textareaId: textarea.id,
+                language
+            });
         });
     });
-});
+};
+
+initMonacoEditors();
