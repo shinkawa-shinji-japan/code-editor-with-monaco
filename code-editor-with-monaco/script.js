@@ -39,16 +39,17 @@ const createFieldButtons = (
             tabItem.classList.remove("active");
             // tabItem.innerHTML = '<div class="editor-container"></div>';
             tabItem.innerHTML = null;
+            resetSize();
             return;
         }
 
         tabItem.classList.add("active");
         newDiv.classList.add("active");
+        resetSize();
         // tabItem.innerHTML = '<div class="editor-container"></div>';
         // initEditor();
         initMonacoEditor({ targetId: editorId, textareaId, language })
     });
-
 
     return newDiv;
 };
@@ -94,6 +95,41 @@ const initMonacoEditor = ({ targetId, textareaId, language }) => {
     );
 }
 
+const resetSize = () => {
+    document.querySelectorAll('.pTab__tabItem').forEach((ele) => {
+        ele.innerHTML = '';
+    });
+
+    const activeButtons = document.querySelectorAll('.js-toggleButton.active');
+
+    var container = document.querySelector(".pTab__tabItemsContainer");
+    container.classList.forEach(cls => {
+        if (cls.startsWith('pTab__tabItemsContainer--col')) {
+            container.classList.remove(cls);
+        }
+    });
+    // 新しいクラスを追加
+    container.classList.add(`pTab__tabItemsContainer--col${activeButtons.length}`);
+
+
+    activeButtons.forEach((ele) => {
+        console.log(ele)
+        const targetId = ele.getAttribute('data-target-editor-id');
+        const textareaId = ele.getAttribute('data-target-textarea-id');
+        const language = ele.getAttribute("data-editor-language");
+        console.log(targetId, textareaId, language)
+        // console.log(document.getElementById(textareaId))
+        // console.log(document.getElementById(textareaId).value)
+        initMonacoEditor({ targetId, textareaId, language })
+    });
+}
+
+
+// // リサイズイベントのハンドラーを定義
+// function handleResize() {
+//     resetSize();
+// }
+
 const initMonacoEditors = () => {
     require.config({
         paths: {
@@ -115,11 +151,13 @@ const initMonacoEditors = () => {
                     tabItem.classList.remove("active");
                     // tabItem.innerHTML = '<div class="editor-container"></div>';
                     tabItem.innerHTML = null;
+                    resetSize();
                     return;
                 }
 
                 tabItem.classList.add("active");
                 newDiv.classList.add("active");
+                resetSize();
                 // tabItem.innerHTML = '<div class="editor-container"></div>';
                 initMonacoEditor({ targetId: editorId, textareaId: "content", language: "html" })
             });
@@ -161,6 +199,13 @@ const initMonacoEditors = () => {
                 language
             });
         });
+
+        // リサイズイベントにハンドラーを登録
+        window.addEventListener('resize', resetSize);
+
+        // 初回の読み込み時にもハンドラーを実行
+        resetSize();
+
     });
 };
 
