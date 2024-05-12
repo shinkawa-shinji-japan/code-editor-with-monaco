@@ -9,6 +9,11 @@ const appendItemDivToItemsContainer = (id) => {
     return newDiv;
 };
 
+const setLocalStorage = (button) => {
+    const isActive = button.classList.contains('active');
+    localStorage.setItem(button.dataset.targetEditorId, isActive);
+}
+
 const createFieldButtons = (
     {
         text,
@@ -32,6 +37,8 @@ const createFieldButtons = (
     container.appendChild(newDiv);
     // divにクリックイベントリスナーを追加
     newDiv.addEventListener("click", () => {
+
+
         const tabItem = document.getElementById(editorId);
 
         if (tabItem.classList.contains("active")) {
@@ -39,12 +46,14 @@ const createFieldButtons = (
             tabItem.classList.remove("active");
             // tabItem.innerHTML = '<div class="editor-container"></div>';
             tabItem.innerHTML = null;
+            setLocalStorage(newDiv);
             resetSize();
             return;
         }
 
         tabItem.classList.add("active");
         newDiv.classList.add("active");
+        setLocalStorage(newDiv);
         resetSize();
         // tabItem.innerHTML = '<div class="editor-container"></div>';
         // initEditor();
@@ -130,6 +139,25 @@ const resetSize = () => {
 //     resetSize();
 // }
 
+const setStateFromLocalStorage = () => {
+    const toggleButtons = document.querySelectorAll('.js-toggleButton');
+
+    // ページロード時に各ボタンの状態を復元
+    toggleButtons.forEach(button => {
+        const id = button.dataset.targetEditorId;
+        const isActive = localStorage.getItem(id) === 'true';
+
+        const editor = document.getElementById(id);
+        if (isActive) {
+            button.classList.add('active');
+            editor.classList.add('active');
+        } else {
+            button.classList.remove('active');
+            editor.classList.remove('active');
+        }
+    });
+}
+
 const initMonacoEditors = () => {
     require.config({
         paths: {
@@ -151,12 +179,14 @@ const initMonacoEditors = () => {
                     tabItem.classList.remove("active");
                     // tabItem.innerHTML = '<div class="editor-container"></div>';
                     tabItem.innerHTML = null;
+                    setLocalStorage(newDiv);
                     resetSize();
                     return;
                 }
 
                 tabItem.classList.add("active");
                 newDiv.classList.add("active");
+                setLocalStorage(newDiv);
                 resetSize();
                 // tabItem.innerHTML = '<div class="editor-container"></div>';
                 initMonacoEditor({ targetId: editorId, textareaId: "content", language: "html" })
@@ -200,12 +230,13 @@ const initMonacoEditors = () => {
             });
         });
 
+        setStateFromLocalStorage();
+
         // リサイズイベントにハンドラーを登録
         window.addEventListener('resize', resetSize);
 
         // 初回の読み込み時にもハンドラーを実行
         resetSize();
-
     });
 };
 

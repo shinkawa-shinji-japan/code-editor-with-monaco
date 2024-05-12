@@ -54,53 +54,13 @@ function replace_textarea_with_monaco()
             </div>
         </div>
     </div>
-
-    <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const buttons = document.querySelectorAll(".pTab__columnChangeButton");
-        const container = document.querySelector(".pTab__tabItemsContainer");
-    
-        buttons.forEach(button => {
-            button.addEventListener("click", function () {
-                buttons.forEach(btn => btn.classList.remove("active"));
-                button.classList.add("active");
-                container.className = "pTab__tabItemsContainer"; // 元のクラス名にリセット
-                const columnClass = "pTab__tabItemsContainer--col" + button.dataset.columns;
-                container.classList.add(columnClass);
-
-                {
-                    document.querySelectorAll(".pTab__tabItem").forEach(element => {
-                        element.classList.remove("active");
-                    });
-                    let num = 1;
-                    document.querySelectorAll(".pTab__tabItem").forEach(element => {
-                        if (num <= button.dataset.columns) {
-                            element.classList.add("active");
-                            num += 1;
-                        }
-                    });
-                }   
-                {
-                    // TODO: 2を押したときにすでにactiveが2個あるなら以下の処理は行わないようにする
-                    // document.querySelectorAll(".pTab__toggleFieldsButton").forEach(element => {
-                    //     element.classList.remove("active");
-                    // });
-                    // let num = 1;
-                    // document.querySelectorAll(".pTab__toggleFieldsButton").forEach(element => {
-                    //     if (num <= button.dataset.columns) {
-                    //         element.classList.add("active");
-                    //         num += 1;
-                    //     }
-                    // });
-                }   
-
-                resetContentEditor()
-                resetCssEditor();
-                resetFooterEditor();
-            });
-        });
-    });
-    </script>
+    <!-- 
+    <div class="pTab__toggleFieldsSelector">
+        <div class="pTab__toggleFieldsTitle">Show Fields: </div>
+        <div class="pTab__toggleFieldsButton active js-toggleButton" data-toggle-fields="content" data-target-editor-id="editor-content" data-target-textarea-id="content" data-editor-language="html">Content</div>
+        <div class="pTab__toggleFieldsButton js-toggleButton active" data-target-editor-id="editor-1" data-target-textarea-id="acf-field_66379ff1bb2ed" data-editor-language="css">CSSコード</div>
+        <div class="pTab__toggleFieldsButton js-toggleButton active" data-target-editor-id="editor-2" data-target-textarea-id="acf-field_663f571173e99" data-editor-language="html">PageFooter</div>
+    </div> -->
     HTML;
 }
 add_action('edit_form_after_title', 'replace_textarea_with_monaco');
