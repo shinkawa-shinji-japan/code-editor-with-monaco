@@ -44,6 +44,12 @@ function replace_textarea_with_monaco()
 {
     echo <<<HTML
     <div class="pTab">
+        <div class="pTab__toggleFieldsSelector">
+            <div class="pTab__toggleFieldsTitle">Show Fields: </div>
+            <div class="pTab__toggleFieldsButton active" data-toggle-fields="content">Content</div>
+            <div class="pTab__toggleFieldsButton" data-toggle-fields="css">Page CSS</div>
+            <div class="pTab__toggleFieldsButton" data-toggle-fields="footer">Page Footer</div>
+        </div>
         <div class="pTab__columnsSelector">
             <div class="pTab__columnsSelectorTitle">Columns: </div>
             <div class="pTab__columnChangeButton active" data-columns="1">1</div>
@@ -67,28 +73,7 @@ function replace_textarea_with_monaco()
             </div>
         </div>
     </div>
-    
-    <script>
-        function updateActiveClasses() {
-            if (window.innerWidth >= 1920) {
-                document.querySelectorAll(".pTab__tabItem").forEach(item => {
-                    item.classList.add("active");
-                });
-                document.querySelector(".pTab__tabItemsContainer").classList.add("pTab__tabItemsContainer--flex");
-            } else {
-                document.querySelector(".pTab__tabItemsContainer").classList.remove("pTab__tabItemsContainer--flex");
-                document.querySelectorAll(".pTab__tabItem:not(:first-child)").forEach(item => {
-                    item.classList.remove("active");
-                });
-            }
-            resetContentEditor()
-            resetCssEditor();
-            resetFooterEditor();
-        }
-        window.addEventListener("resize", updateActiveClasses);
-        document.addEventListener("DOMContentLoaded", updateActiveClasses);
-    </script>
-    
+
     <script>
     document.addEventListener("DOMContentLoaded", function () {
         const buttons = document.querySelectorAll(".pTab__columnChangeButton");
@@ -96,18 +81,37 @@ function replace_textarea_with_monaco()
     
         buttons.forEach(button => {
             button.addEventListener("click", function () {
-                // 全てのボタンから "active" クラスを削除
                 buttons.forEach(btn => btn.classList.remove("active"));
-    
-                // クリックされたボタンに "active" クラスを付与
                 button.classList.add("active");
-    
-                // container からすべてのカラムクラスを削除
                 container.className = "pTab__tabItemsContainer"; // 元のクラス名にリセット
-    
-                // クリックされたボタンに応じたクラスをcontainerに追加
                 const columnClass = "pTab__tabItemsContainer--col" + button.dataset.columns;
                 container.classList.add(columnClass);
+
+                {
+                    document.querySelectorAll(".pTab__tabItem").forEach(element => {
+                        element.classList.remove("active");
+                    });
+                    let num = 1;
+                    document.querySelectorAll(".pTab__tabItem").forEach(element => {
+                        if (num <= button.dataset.columns) {
+                            element.classList.add("active");
+                            num += 1;
+                        }
+                    });
+                }   
+                {
+                    // TODO: 2を押したときにすでにactiveが2個あるなら以下の処理は行わないようにする
+                    // document.querySelectorAll(".pTab__toggleFieldsButton").forEach(element => {
+                    //     element.classList.remove("active");
+                    // });
+                    // let num = 1;
+                    // document.querySelectorAll(".pTab__toggleFieldsButton").forEach(element => {
+                    //     if (num <= button.dataset.columns) {
+                    //         element.classList.add("active");
+                    //         num += 1;
+                    //     }
+                    // });
+                }   
 
                 resetContentEditor()
                 resetCssEditor();

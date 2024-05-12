@@ -8,6 +8,32 @@
 .pTab {
     height: calc(100vh - 200px);
 }
+.pTab__toggleFieldsSelector {
+    width: 100%;
+    
+    display: flex;
+    padding: 8px;
+}
+.pTab__toggleFieldsTitle {
+    padding: 4px;
+    min-width: 80px;
+    display: grid;
+    place-items: center;
+}
+.pTab__toggleFieldsButton {
+    padding: 4px;
+    border: 1px solid #000;
+    min-width: 80px;
+    display: grid;
+    place-items: center;
+}
+.pTab__toggleFieldsButton:hover {
+    cursor: pointer;
+}
+.pTab__toggleFieldsButton.active {
+    background: #000;
+    color: #fff;
+}
 .pTab__columnsSelector {
     width: 100%;
     

@@ -97,7 +97,6 @@ const initFooterEditor = () => {
     require(["vs/editor/editor.main"], function() {
         var footerCodeEditor = document.getElementById("acf-field_663f571173e99");
         if (!footerCodeEditor) return; 
-        console.log(footerCodeEditor);
         
         var editor = monaco.editor.create(document.getElementById("editor-container-footer"), {
             value: footerCodeEditor.value,
@@ -121,7 +120,7 @@ const initFooterEditor = () => {
         });
     });
 }
-initFooterEditor();
+// initFooterEditor();
 
 
 document.querySelectorAll(".pTab__tabName").forEach(element => {
@@ -202,3 +201,23 @@ const showTab = (name, clickedElment) => {
         return
     }
 }
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // すべてのトグルフィールドボタンにイベントリスナーを設定
+    document.querySelectorAll('.pTab__toggleFieldsButton').forEach(button => {
+        button.addEventListener('click', function() {
+            // ボタンのdata-toggle-fields属性から対象のフィールド名を取得
+            const targetField = this.getAttribute('data-toggle-fields');
+            this.classList.toggle("active");
+
+            // 対応するタブアイテムを選択
+            const targetTabItem = document.querySelector(`.pTab__tabItem[data-tab-item="${targetField}"]`);
+
+            // 対象のタブアイテムのactiveクラスをトグル
+            if (targetTabItem) {
+                targetTabItem.classList.toggle('active');
+            }
+        });
+    });
+});
