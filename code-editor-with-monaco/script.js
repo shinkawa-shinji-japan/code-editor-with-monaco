@@ -78,7 +78,7 @@ const initMonacoEditor = ({ targetId, textareaId, language }) => {
         autoClosingTags: true, // 効いてないぽい
     });
     editor.onDidChangeModelContent(function () {
-        editor.value = editor.getValue();
+        document.getElementById(textareaId).value = editor.getValue();
     });
 
     editor.addCommand(
